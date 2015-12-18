@@ -90,7 +90,7 @@ module Afterbuy
         "Afterbuy::Representer::#{METHOD_REQUEST_MAPPING[method_name]}RequestRepresenter".constantize.new(
           "Afterbuy::#{METHOD_REQUEST_MAPPING[method_name]}Request".constantize.new(request_params)
         ).to_xml
-        binding.pry
+        # binding.pry
       end
 
       def shop_interface_request_params(global_params={}, request=Afterbuy::ShopInterfaceRequest.new)

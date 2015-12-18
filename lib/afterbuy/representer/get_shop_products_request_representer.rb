@@ -4,8 +4,13 @@ module Afterbuy
 
   module Representer
     class GetShopProductsRequestRepresenter < RequestRepresenter
-      collection :filters, as: :DataFilter, wrap: :DataFilter, extend: DataFilterRepresenter, class: DataFilter
+      # collection :filters, as: :DataFilter, wrap: :DataFilter, extend: DataFilterRepresenter, class: DataFilter
       # include FilterRepresenter
+      collection :products, as: :Product, wrap: :DataFilter, extend: DataFilterRepresenter, class: DataFilter
+
+      # property :data_filter, as: :DataFilter, class: DataFilter do
+      #   include DataFilterRepresenter
+      # end
 
       # nested :data_filter, as: :DataFilter do
       #   nested :filter, as: :Filter do
@@ -13,7 +18,6 @@ module Afterbuy
       #     property :filter_value, as: :FilterValue, wrap: :FilterValues, getter: lambda {|*| self[:afterbuy_product_ids].join(";") }
       #   end
       # end
-
 
     end
   end
