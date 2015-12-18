@@ -11,6 +11,7 @@ require 'afterbuy/errors'
 require 'afterbuy/middleware/error_detector'
 
 require 'afterbuy/representer/data_filter_representer'
+require 'afterbuy/representer/filter_representer'
 require 'afterbuy/representer/global_representer'
 require 'afterbuy/representer/request_representer'
 

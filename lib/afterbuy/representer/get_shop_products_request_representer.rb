@@ -4,12 +4,38 @@ module Afterbuy
 
   module Representer
     class GetShopProductsRequestRepresenter < RequestRepresenter
-      # collection :filters, as: :DataFilter, wrap: :DataFilter, extend: DataFilterRepresenter, class: DataFilter
-      # include FilterRepresenter
       collection :products, as: :Product, wrap: :DataFilter, extend: DataFilterRepresenter, class: DataFilter
 
       # property :data_filter, as: :DataFilter, class: DataFilter do
       #   include DataFilterRepresenter
+
+      # include Roar::XML
+      # collection :data_filters, as: :DataFilter, wrap: :DataFilter, extend: DataFilterRepresenter
+      # collection :add_filters1 do
+      #   self.representation_wrap  = :DataFilter
+
+      #   collection :add_filters do
+      #     # include Afterbuy::Representer::FilterRepresenter
+      #      # self.representation_wrap = :Filter
+      #       collection :add_filters do
+      #         property :filter_name, as: :FilterName, getter: lambda {|*| "ProductID" }
+      #         property :filter_value, as: :FilterValue, wrap: :FilterValues, getter: ->() { self[:afterbuy_product_ids].join(";") }
+      #       end
+      #     self.representation_wrap = :Filter
+      #   end
+      # end
+
+
+      # collection :add_filters do
+      #   self.representation_wrap  = :DataFilter
+      #   include FilterRepresenter
+      #   self.representation_wrap = :Filter
+      # end
+
+
+      # collection :data_filter, class: DataFilter do
+      #   self.representation_wrap = :DataFilter
+      #   property :mimi
       # end
 
       # nested :data_filter, as: :DataFilter do
@@ -20,6 +46,13 @@ module Afterbuy
       # end
 
     end
+    # module Filters
+    #   include Roar::XML
+
+    #   self.representation_wrap  = :DataFilter
+    #   include FilterRepresenter
+    #   self.representation_wrap = :Filter
+    # end
   end
 end
 # <DataFilter>
