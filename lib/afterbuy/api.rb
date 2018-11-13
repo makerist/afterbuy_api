@@ -32,7 +32,9 @@ module Afterbuy
     def call(method_name, global_params: {}, payload: {})
       self.debug_info = { request_params: request_params(method_name, global_params, payload) }
 
-      response = post connection, request_params(method_name, global_params, payload)
+      response = connection.post do |req|
+        req.body = request_params(method_name, global_params, payload)
+      end
 
       self.debug_info[:response_body] = response.body
 
@@ -42,19 +44,13 @@ module Afterbuy
     def shop_interface_call(global_params: {}, request: Afterbuy::ShopInterfaceRequest.new)
       self.debug_info = { request_params: shop_interface_request_params(global_params, request).to_hash }
 
-      response = post shop_interface_connection, shop_interface_request_params(global_params, request).to_hash
+      response = shop_interface_connection.post do |req|
+        req.body = shop_interface_request_params(global_params, request).to_hash
+      end
 
       self.debug_info[:response_body] = response.body
 
       Afterbuy::Representer::ShopInterfaceResponseRepresenter.new(Afterbuy::ShopInterfaceResponse.new).from_xml(response.body)
-    end
-
-    def post(conn, req_params)
-      with_resolv_replace do
-        conn.post do |req|
-          req.body = req_params
-        end
-      end
     end
 
     def connection
@@ -74,30 +70,6 @@ module Afterbuy
     end
 
     private
-
-    # Requiring 'resolv-replace' can produce unwanted side effects, for instance:
-    # https://github.com/mperham/sidekiq/issues/1258
-    # To avoid this it is required in a separate process only there where it is needed.
-    # Here it is needed because the DNS resolve took to long on production servers (> 120sec).
-    # Idea taken from https://stackoverflow.com/questions/1076257/returning-data-from-forked-processes/1076445#1076445
-    def with_resolv_replace(&block)
-      read, write = IO.pipe
-
-      pid = fork do
-        require 'resolv-replace'
-        read.close
-
-        result = block.call
-
-        Marshal.dump(result, write)
-        exit!(0) # skips exit handlers.
-      end
-
-      write.close
-      result = read.read
-      Process.wait(pid)
-      Marshal.load(result)
-    end
 
       def request_params(method_name, global_params={}, payload={})
         request_params = payload.merge({
