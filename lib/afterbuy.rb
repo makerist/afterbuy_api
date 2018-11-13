@@ -5,8 +5,6 @@ require 'ostruct'
 require 'roar/decorator'
 require 'roar/xml'
 
-require 'resolv-replace' # because of https://github.com/ruby/ruby/pull/597#issuecomment-40507119
-
 require 'afterbuy/version'
 require 'afterbuy/errors'
 
