@@ -56,7 +56,7 @@ module Afterbuy
     def connection
       @connection ||= Faraday.new(url: @api_url) do |faraday|
         faraday.headers['Content-Type'] = 'application/xml'
-        faraday.adapter Faraday.default_adapter
+        faraday.adapter :afterbuy_http
         faraday.use Afterbuy::Middleware::ErrorDetector
       end
     end
@@ -64,7 +64,7 @@ module Afterbuy
     def shop_interface_connection
       @shop_interface_connection ||= Faraday.new(url: @shop_interface_url) do |faraday|
         faraday.request  :url_encoded
-        faraday.adapter Faraday.default_adapter
+        faraday.adapter :afterbuy_http
         faraday.use Afterbuy::Middleware::ErrorDetector
       end
     end
