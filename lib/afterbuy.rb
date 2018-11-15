@@ -1,6 +1,7 @@
 require 'active_support/configurable'
 require 'active_support/inflector'
 require 'faraday'
+require 'faraday/adapter/afterbuy_http'
 require 'ostruct'
 require 'roar/decorator'
 require 'roar/xml'
