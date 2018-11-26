@@ -30,46 +30,39 @@ module Afterbuy
     end
 
     def call(method_name, global_params: {}, payload: {})
-      self.debug_info = { request_params: request_params(method_name, global_params, payload) }
+      params = request_params(method_name, global_params, payload)
+      response = post params, headers: { 'Content-Type' => 'application/xml' }
 
-      response = connection.post do |req|
-        req.body = request_params(method_name, global_params, payload)
-      end
-
-      self.debug_info[:response_body] = response.body
-
-      "Afterbuy::Representer::#{METHOD_RESPONSE_MAPPING[method_name]}ResponseRepresenter".constantize.new("Afterbuy::#{METHOD_RESPONSE_MAPPING[method_name]}Response".constantize.new).from_xml(response.body)
+      "Afterbuy::Representer::#{METHOD_RESPONSE_MAPPING[method_name]}ResponseRepresenter".constantize.new(
+        "Afterbuy::#{METHOD_RESPONSE_MAPPING[method_name]}Response".constantize.new
+      ).from_xml(response.body.to_s)
     end
 
     def shop_interface_call(global_params: {}, request: Afterbuy::ShopInterfaceRequest.new)
-      self.debug_info = { request_params: shop_interface_request_params(global_params, request).to_hash }
+      params = shop_interface_request_params(global_params, request).to_hash
+      response = post params, api_type: :shop_interface
 
-      response = shop_interface_connection.post do |req|
-        req.body = shop_interface_request_params(global_params, request).to_hash
-      end
-
-      self.debug_info[:response_body] = response.body
-
-      Afterbuy::Representer::ShopInterfaceResponseRepresenter.new(Afterbuy::ShopInterfaceResponse.new).from_xml(response.body)
-    end
-
-    def connection
-      @connection ||= Faraday.new(url: @api_url) do |faraday|
-        faraday.headers['Content-Type'] = 'application/xml'
-        faraday.adapter Faraday.default_adapter
-        faraday.use Afterbuy::Middleware::ErrorDetector
-      end
-    end
-
-    def shop_interface_connection
-      @shop_interface_connection ||= Faraday.new(url: @shop_interface_url) do |faraday|
-        faraday.request  :url_encoded
-        faraday.adapter Faraday.default_adapter
-        faraday.use Afterbuy::Middleware::ErrorDetector
-      end
+      Afterbuy::Representer::ShopInterfaceResponseRepresenter.new(
+        Afterbuy::ShopInterfaceResponse.new
+      ).from_xml(response.body.to_s)
     end
 
     private
+
+    def post(body, options = {})
+      url = options.delete(:api_type) == :shop_interface ? @shop_interface_url : @api_url
+      http = HTTP
+      options.each do |key, value|
+        http = http.public_send(key, value)
+      end
+
+      self.debug_info = { request_params: body }
+      response = http.post url, body: body
+      self.debug_info[:response_body] = response.body.to_s
+
+      raise APIError, response.body.to_s unless response.status.success?
+      response
+    end
 
       def request_params(method_name, global_params={}, payload={})
         request_params = payload.merge({

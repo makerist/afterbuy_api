@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency 'activesupport', '~> 4.2'
-  spec.add_dependency 'faraday'
+  spec.add_dependency 'http'
   spec.add_dependency 'roar'
   spec.add_dependency 'nokogiri'
 
