@@ -1,6 +1,6 @@
 module Afterbuy
   module Middleware
-    class ErrorDetector < Faraday::Middleware
+    class ErrorDetector < Net::HTTP
 
       def call(env)
         @app.call(env).on_complete do |env|
